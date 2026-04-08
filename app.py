@@ -91,6 +91,9 @@ def register():
     try:
         data = request.get_json()
 
+        if not data:
+            return jsonify({"message": "No data"}), 400
+
         name = data.get("name")
         email = data.get("email")
         password = data.get("password")
@@ -108,8 +111,8 @@ def register():
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
         cur.execute(
-            "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-            (name, email, hashed)
+            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+            (name, email, hashed, "user")
         )
 
         conn.commit()
@@ -132,14 +135,21 @@ def register():
         print("🔥 REGISTER ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
-# ================= LOGIN =================
+
+# ================= LOGIN (FIX UTAMA) =================
 @app.route("/api/auth/login", methods=["POST"])
 def login():
     try:
         data = request.get_json()
 
+        if not data:
+            return jsonify({"message": "No data"}), 400
+
         email = data.get("email")
         password = data.get("password")
+
+        if not email or not password:
+            return jsonify({"message": "Email & password wajib"}), 400
 
         conn = get_db()
         cur = conn.cursor()
@@ -166,16 +176,24 @@ def login():
 
         conn.close()
 
+        # 🔥 FIX: kirim user ke frontend
         return jsonify({
             "message": "Login berhasil",
-            "token": token
+            "token": token,
+            "user": {
+                "id": user["id"],
+                "name": user["name"],
+                "email": user["email"],
+                "role": user["role"]
+            }
         })
 
     except Exception as e:
         print("🔥 LOGIN ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
-# ================= GET SERVICES (FIX UTAMA) =================
+
+# ================= GET SERVICES =================
 @app.route("/prices", methods=["GET"])
 def get_prices():
     try:
@@ -192,6 +210,7 @@ def get_prices():
     except Exception as e:
         print("❌ ERROR LOAD PRICES:", e)
         return jsonify({"message": "Gagal load data services"}), 500
+
 
 # ================= BOOKING =================
 @app.route("/api/bookings", methods=["POST"])
@@ -228,15 +247,18 @@ def create_booking():
         print("❌ BOOKING ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
-# ================= HEALTH CHECK =================
+
+# ================= HEALTH =================
 @app.route("/health")
 def health():
     return jsonify({"status": "OK"})
+
 
 # ================= ROOT =================
 @app.route("/")
 def home():
     return "MARSEA API is running 🚀"
+
 
 # ================= RUN =================
 PORT = int(os.environ.get("PORT", 5000))
