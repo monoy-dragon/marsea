@@ -264,6 +264,33 @@ def get_bookings():
         print("❌ ERROR GET BOOKINGS:", e)
         return jsonify({"message": "Server error"}), 500
 
+# ================= ADMIN: GET ALL BOOKINGS =================
+@app.route("/api/admin/bookings", methods=["GET"])
+def admin_get_bookings():
+    user = get_current_user()
+
+    # 🔐 hanya admin boleh akses
+    if not user or user.get("role") != "admin":
+        return jsonify({"message": "Forbidden"}), 403
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT * FROM bookings
+            ORDER BY created_at DESC
+        """)
+
+        rows = cur.fetchall()
+        conn.close()
+
+        return jsonify([dict(r) for r in rows])
+
+    except Exception as e:
+        print("❌ ADMIN GET BOOKINGS ERROR:", e)
+        return jsonify({"message": "Server error"}), 500
+
 
 # ================= HEALTH =================
 @app.route("/health")
