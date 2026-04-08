@@ -9,6 +9,9 @@ import os
 
 app = Flask(__name__)
 
+# ================= CONFIG =================
+SECRET_KEY = "marsea_secret_key"
+
 # ================= CORS =================
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -27,8 +30,6 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
     return response
-
-SECRET_KEY = "marsea_secret_key"
 
 # ================= DATABASE =================
 def get_db():
@@ -91,9 +92,6 @@ def register():
     try:
         data = request.get_json()
 
-        if not data:
-            return jsonify({"message": "No data"}), 400
-
         name = data.get("name")
         email = data.get("email")
         password = data.get("password")
@@ -117,14 +115,13 @@ def register():
 
         conn.commit()
         user_id = cur.lastrowid
+        conn.close()
 
         token = jwt.encode({
             "user_id": user_id,
             "role": "user",
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
         }, SECRET_KEY, algorithm="HS256")
-
-        conn.close()
 
         return jsonify({
             "message": "Register berhasil",
@@ -136,20 +133,14 @@ def register():
         return jsonify({"message": "Server error"}), 500
 
 
-# ================= LOGIN (FIX UTAMA) =================
+# ================= LOGIN =================
 @app.route("/api/auth/login", methods=["POST"])
 def login():
     try:
         data = request.get_json()
 
-        if not data:
-            return jsonify({"message": "No data"}), 400
-
         email = data.get("email")
         password = data.get("password")
-
-        if not email or not password:
-            return jsonify({"message": "Email & password wajib"}), 400
 
         conn = get_db()
         cur = conn.cursor()
@@ -176,7 +167,6 @@ def login():
 
         conn.close()
 
-        # 🔥 FIX: kirim user ke frontend
         return jsonify({
             "message": "Login berhasil",
             "token": token,
@@ -209,10 +199,10 @@ def get_prices():
 
     except Exception as e:
         print("❌ ERROR LOAD PRICES:", e)
-        return jsonify({"message": "Gagal load data services"}), 500
+        return jsonify({"message": "Gagal load data"}), 500
 
 
-# ================= BOOKING =================
+# ================= CREATE BOOKING =================
 @app.route("/api/bookings", methods=["POST"])
 def create_booking():
     user = get_current_user()
@@ -245,6 +235,33 @@ def create_booking():
 
     except Exception as e:
         print("❌ BOOKING ERROR:", e)
+        return jsonify({"message": "Server error"}), 500
+
+
+# ================= GET BOOKINGS (FIX DASHBOARD) =================
+@app.route("/api/bookings", methods=["GET"])
+def get_bookings():
+    user = get_current_user()
+    if not user:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT * FROM bookings 
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+        """, (user["user_id"],))
+
+        rows = cur.fetchall()
+        conn.close()
+
+        return jsonify([dict(r) for r in rows])
+
+    except Exception as e:
+        print("❌ ERROR GET BOOKINGS:", e)
         return jsonify({"message": "Server error"}), 500
 
 
