@@ -1,0 +1,139 @@
+[
+  {
+    "name": "Fuel Supply",
+    "slug": "fuel_supply",
+    "description": "Pengisian bahan bakar kapal (MGO) di area offshore MARSEA.",
+    "location": "MARSEA Arunika",
+    "unit": "per operasi pengisian",
+    "pricing": {
+      "passenger": 8000000,
+      "logistics": 12000000,
+      "tanker": 20000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 2000000,
+      "midstream": 4000000
+    }
+  },
+  {
+    "name": "Water Supply",
+    "slug": "water_supply",
+    "description": "Pengisian air tawar (fresh water) untuk kebutuhan operasional kapal.",
+    "location": "MARSEA Arunika",
+    "unit": "per operasi pengisian",
+    "pricing": {
+      "passenger": 3000000,
+      "logistics": 4000000,
+      "tanker": 6000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 1000000,
+      "midstream": 2500000
+    }
+  },
+  {
+    "name": "Docking Assistance",
+    "slug": "docking",
+    "description": "Bantuan sandar di titik aman MARSEA untuk pergantian kru dan logistik.",
+    "location": "MARSEA Arunika / Samudra",
+    "unit": "per kedatangan",
+    "pricing": {
+      "passenger": 10000000,
+      "logistics": 18000000,
+      "tanker": 30000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 3000000,
+      "midstream": 6000000
+    }
+  },
+  {
+    "name": "Waste Management",
+    "slug": "waste_management",
+    "description": "Pengelolaan limbah cair dan padat sesuai standar MARPOL.",
+    "location": "MARSEA Samudra",
+    "unit": "per ton limbah",
+    "pricing": {
+      "passenger": 6000000,
+      "logistics": 9000000,
+      "tanker": 14000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 2000000,
+      "midstream": 3500000
+    }
+  },
+  {
+    "name": "Maintenance (Underwater)",
+    "slug": "maintenance",
+    "description": "Hull cleaning, propeller polishing, dan basic underwater visual check.",
+    "location": "MARSEA Nirwana",
+    "unit": "per sesi pekerjaan",
+    "pricing": {
+      "passenger": 18000000,
+      "logistics": 25000000,
+      "tanker": 35000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 4000000,
+      "midstream": 7000000
+    }
+  },
+  {
+    "name": "Inspection Ship",
+    "slug": "inspection",
+    "description": "Pemeriksaan teknis ringan kapal untuk memastikan kondisi operasional dasar.",
+    "location": "MARSEA Nirwana",
+    "unit": "per inspeksi",
+    "pricing": {
+      "passenger": 12000000,
+      "logistics": 18000000,
+      "tanker": 28000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 3000000,
+      "midstream": 5000000
+    }
+  },
+  {
+    "name": "Survey Ship (Full)",
+    "slug": "survey_ship",
+    "description": "Survey menyeluruh mencakup mesin, struktur, navigasi, keselamatan, dan kelistrikan.",
+    "location": "MARSEA Nirwana",
+    "unit": "per survey lengkap",
+    "pricing": {
+      "passenger": 20000000,
+      "logistics": 32000000,
+      "tanker": 48000000
+    },
+    "surcharge": {
+      "pier": 0,
+      "mooring": 5000000,
+      "midstream": 9000000
+    }
+  },
+  {
+    "name": "Emergency Response",
+    "slug": "emergency",
+    "description": "Bantuan darurat maritim 24/7 untuk area ALKI 1 di sekitar MARSEA Samudra.",
+    "location": "MARSEA Samudra",
+    "emergency_response_fee": {
+      "passenger": 20000000,
+      "logistics": 30000000,
+      "tanker": 50000000
+    },
+    "addons": {
+      "medical_response": "Variable (berdasar kebutuhan medis di kapal)",
+      "fire_response": "Variable (berdasar skala kebakaran dan foam agent)",
+      "towing_assistance": "Per nautical mile",
+      "underwater_emergency": "Variable (tarif diver darurat)",
+      "mechanical_breakdown": "Variable (durasi dan kompleksitas)"
+    }
+  }
+]

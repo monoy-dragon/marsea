@@ -1,0 +1,67 @@
+{
+  "partners": [
+    {
+      "name": "PT PERTAMINA PATRA NIAGA",
+      "category": "Fuel Supply",
+      "services": ["Bahan Bakar Marine", "Quality & Safety Control"],
+      "logo": "pertamina-patra-niaga.png",
+      "contact": { "phone": "6281312345678", "website": "https://patraniaga.pertamina.com" }
+    },
+    {
+      "name": "Samudera Global Inti",
+      "category": "Ship Chandler & Supplies",
+      "services": ["Provisi & Perbekalan", "Deck/Engine Stores"],
+      "logo": "samudera-global-inti.png",
+      "contact": { "phone": "6282211111111", "website": "" }
+    },
+    {
+      "name": "DUA BERJAYA & CO",
+      "category": "Ship Chandler & Supplies",
+      "services": ["General Ship Supply", "Spare Parts", "Catering Support"],
+      "logo": "dua-berjaya-co.png",
+      "contact": { "phone": "6285799999999", "website": "" }
+    },
+    {
+      "name": "CV PUTRA SABA MANDIRI",
+      "category": "Ship Chandler & Supplies",
+      "services": ["Deck/Engine Stores", "Consumables"],
+      "logo": "cv-putra-saba-mandiri.png",
+      "contact": { "phone": "6281333344444", "website": "" }
+    },
+    {
+      "name": "Segara Interservis",
+      "category": "Maintenance & Repair",
+      "services": ["Hull & Mechanical Repair", "On-site Maintenance", "Cleaning & Coating"],
+      "logo": "segara-interservis.png",
+      "contact": { "phone": "6285955512345", "website": "" }
+    },
+    {
+      "name": "PT Caputra Mitra Sejati",
+      "category": "Maintenance & Repair",
+      "services": ["Electrical/Mechanical Service", "Docking Light", "Fabrication Support"],
+      "logo": "pt-caputra-mitra-sejati.png",
+      "contact": { "phone": "6281312349876", "website": "" }
+    },
+    {
+      "name": "IMS CIGADING GROUP",
+      "category": "Inspection & Survey",
+      "services": ["Marine Inspection", "Survey & Certification Assist"],
+      "logo": "ims-cigading-group.png",
+      "contact": { "phone": "6281234567890", "website": "" }
+    },
+    {
+      "name": "PT HITO GLOBAL SINERGI",
+      "category": "Inspection & Survey",
+      "services": ["Condition Survey", "Thickness Measurement"],
+      "logo": "pt-hito-global-sinergi.png",
+      "contact": { "phone": "6281898989898", "website": "" }
+    },
+    {
+      "name": "CV CAHAYA BINTANG NUSANTARA",
+      "category": "Inspection & Survey",
+      "services": ["Pre-Arrival Check", "Safety Documentation"],
+      "logo": "cv-cahaya-bintang-nusantara.png",
+      "contact": { "phone": "6285155555555", "website": "" }
+    }
+  ]
+}

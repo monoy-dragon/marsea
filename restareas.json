@@ -1,0 +1,32 @@
+[
+  {
+    "id": "R1",
+    "name": "MARSEA Arunika",
+    "lat": -5.986667,
+    "lng": 105.985839,
+    "capacity": 12,
+    "available": 4,
+    "function": "Fuel & Water",
+    "radius": 240
+  },
+  {
+    "id": "R2",
+    "name": "MARSEA Samudra",
+    "lat": -5.985630,
+    "lng": 105.986457,
+    "capacity": 10,
+    "available": 6,
+    "function": "Waste Management & Emergency Response",
+    "radius": 240
+  },
+  {
+    "id": "R3",
+    "name": "MARSEA Nirwana",
+    "lat": -5.984948,
+    "lng": 105.988268,
+    "capacity": 8,
+    "available": 3,
+    "function": "Maintenance, Inspection Ship & Survey Ship",
+    "radius": 240
+  }
+]
