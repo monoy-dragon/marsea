@@ -1,0 +1,48 @@
+{
+  "lastUpdate": "16/11/2025, 22:04:15",
+
+  "kpi": {
+    "activeVessels": 12,
+    "dominantVesselType": "Logistics",
+    "availableSlots": 5,
+    "averageNdwi": 0.75
+  },
+
+  "ndwiTrend": [
+    { "point": "P1", "value": 0.72 },
+    { "point": "P2", "value": 0.74 },
+    { "point": "P3", "value": 0.70 },
+    { "point": "P4", "value": 0.78 },
+    { "point": "P5", "value": 0.73 },
+    { "point": "P6", "value": 0.75 }
+  ],
+
+  "restArea": [
+    {
+      "id": "RA-01",
+      "name": "Dermaga A",
+      "capacity": 10,
+      "occupied": 7
+    },
+    {
+      "id": "RA-02",
+      "name": "Dermaga B",
+      "capacity": 8,
+      "occupied": 6
+    },
+    {
+      "id": "RA-03",
+      "name": "Dermaga C",
+      "capacity": 12,
+      "occupied": 4
+    }
+  ],
+
+  "vessels": [
+    { "id": "S-101", "type": "Logistics" },
+    { "id": "S-102", "type": "Logistics" },
+    { "id": "S-103", "type": "Passenger" },
+    { "id": "S-104", "type": "Tanker" },
+    { "id": "S-105", "type": "Operational" }
+  ]
+}
