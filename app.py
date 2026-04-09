@@ -7,7 +7,11 @@ import psycopg2
 import json
 import os
 
+print("🚀 APP STARTED")
+
 app = Flask(__name__)
+
+print("FLASK APP CREATED")
 
 # ================= CONFIG =================
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -325,6 +329,8 @@ def health():
 @app.route("/")
 def home():
     return "MARSEA API is running 🚀"
+
+print("ALL ROUTES LOADED")
 
 
 # ================= RUN =================
