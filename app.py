@@ -3,14 +3,14 @@ from flask_cors import CORS
 import jwt
 import datetime
 import bcrypt
-import sqlite3
+import psycopg2
 import json
 import os
 
 app = Flask(__name__)
 
 # ================= CONFIG =================
-SECRET_KEY = "marsea_secret_key"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # ================= CORS =================
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -33,9 +33,14 @@ def add_cors_headers(response):
 
 # ================= DATABASE =================
 def get_db():
-    conn = sqlite3.connect("marsea.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    return psycopg2.connect(
+        os.environ["DATABASE_URL"],
+        sslmode="require"
+    )
+
+def rows_to_dict(cur, rows):
+    columns = [desc[0] for desc in cur.description]
+    return [dict(zip(columns, row)) for row in rows]
 
 def init_db():
     conn = get_db()
@@ -43,7 +48,7 @@ def init_db():
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT,
         email TEXT UNIQUE,
         password TEXT,
@@ -54,7 +59,7 @@ def init_db():
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS bookings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER,
         service_name TEXT,
         vessel_class TEXT,
@@ -102,19 +107,19 @@ def register():
         conn = get_db()
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM users WHERE email = ?", (email,))
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         if cur.fetchone():
             return jsonify({"message": "Email sudah terdaftar"}), 400
 
         hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
         cur.execute(
-            "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+            "INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s) RETURNING id",
             (name, email, hashed, "user")
         )
 
+        user_id = cur.fetchone()[0]
         conn.commit()
-        user_id = cur.lastrowid
         conn.close()
 
         token = jwt.encode({
@@ -145,11 +150,14 @@ def login():
         conn = get_db()
         cur = conn.cursor()
 
-        cur.execute("SELECT * FROM users WHERE email = ?", (email,))
+        cur.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cur.fetchone()
 
         if not user:
             return jsonify({"message": "User tidak ditemukan"}), 401
+
+        # convert ke dict
+        user = dict(zip([desc[0] for desc in cur.description], user))
 
         stored_password = user["password"]
 
@@ -218,7 +226,7 @@ def create_booking():
         cur.execute("""
             INSERT INTO bookings 
             (user_id, service_name, vessel_class, mode, qty, total_price)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (
             user["user_id"],
             data.get("service_name"),
@@ -238,7 +246,7 @@ def create_booking():
         return jsonify({"message": "Server error"}), 500
 
 
-# ================= GET BOOKINGS (FIX DASHBOARD) =================
+# ================= GET BOOKINGS =================
 @app.route("/api/bookings", methods=["GET"])
 def get_bookings():
     user = get_current_user()
@@ -251,25 +259,25 @@ def get_bookings():
 
         cur.execute("""
             SELECT * FROM bookings 
-            WHERE user_id = ?
+            WHERE user_id = %s
             ORDER BY created_at DESC
         """, (user["user_id"],))
 
         rows = cur.fetchall()
         conn.close()
 
-        return jsonify([dict(r) for r in rows])
+        return jsonify(rows_to_dict(cur, rows))
 
     except Exception as e:
         print("❌ ERROR GET BOOKINGS:", e)
         return jsonify({"message": "Server error"}), 500
 
-# ================= ADMIN: GET ALL BOOKINGS =================
+
+# ================= ADMIN =================
 @app.route("/api/admin/bookings", methods=["GET"])
 def admin_get_bookings():
     user = get_current_user()
- 
-    # 🔐 hanya admin boleh akses
+
     if not user or user.get("role") != "admin":
         return jsonify({"message": "Forbidden"}), 403
 
@@ -277,26 +285,23 @@ def admin_get_bookings():
         conn = get_db()
         cur = conn.cursor()
 
-        cur.execute("""
-            SELECT * FROM bookings
-            ORDER BY created_at DESC
-        """)
+        cur.execute("SELECT * FROM bookings ORDER BY created_at DESC")
 
         rows = cur.fetchall()
         conn.close()
 
-        return jsonify([dict(r) for r in rows])
+        return jsonify(rows_to_dict(cur, rows))
 
     except Exception as e:
-        print("❌ ADMIN GET BOOKINGS ERROR:", e)
+        print("❌ ADMIN ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
-# ================= ADMIN: UPDATE STATUS =================
+
+# ================= UPDATE STATUS =================
 @app.route("/api/admin/bookings/<int:booking_id>/status", methods=["PUT"])
 def admin_update_status(booking_id):
     user = get_current_user()
 
-    # 🔐 hanya admin
     if not user or user.get("role") != "admin":
         return jsonify({"message": "Forbidden"}), 403
 
@@ -304,35 +309,28 @@ def admin_update_status(booking_id):
         data = request.get_json()
         status = data.get("status")
 
-        # validasi status
         if status not in ["approved", "rejected"]:
             return jsonify({"message": "Status tidak valid"}), 400
 
         conn = get_db()
         cur = conn.cursor()
 
-        # cek booking ada atau tidak
-        cur.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,))
-        booking = cur.fetchone()
-
-        if not booking:
+        cur.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
+        if not cur.fetchone():
             return jsonify({"message": "Booking tidak ditemukan"}), 404
 
-        # update status
         cur.execute(
-            "UPDATE bookings SET status = ? WHERE id = ?",
+            "UPDATE bookings SET status = %s WHERE id = %s",
             (status, booking_id)
         )
 
         conn.commit()
         conn.close()
 
-        return jsonify({
-            "message": f"Status berhasil diubah ke {status}"
-        })
+        return jsonify({"message": f"Status berhasil diubah ke {status}"})
 
     except Exception as e:
-        print("❌ UPDATE STATUS ERROR:", e)
+        print("❌ UPDATE ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
 
