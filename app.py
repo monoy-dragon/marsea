@@ -12,23 +12,29 @@ app = Flask(__name__)
 # ================= CONFIG =================
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# ================= CORS =================
-CORS(app, resources={r"/*": {"origins": "*"}})
+# ================= CORS (FIX TOTAL) =================
+CORS(
+    app,
+    supports_credentials=True,
+    resources={r"/*": {"origins": "*"}},
+    allow_headers=["Content-Type", "Authorization"],
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+)
 
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
-        response = jsonify({"message": "OK"})
-        response.headers.add("Access-Control-Allow-Origin", "*")
-        response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-        response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        response = app.make_response("")
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
         return response
 
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
-    response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
 
 # ================= DATABASE =================
@@ -156,7 +162,6 @@ def login():
         if not user:
             return jsonify({"message": "User tidak ditemukan"}), 401
 
-        # convert ke dict
         user = dict(zip([desc[0] for desc in cur.description], user))
 
         stored_password = user["password"]
@@ -178,36 +183,12 @@ def login():
         return jsonify({
             "message": "Login berhasil",
             "token": token,
-            "user": {
-                "id": user["id"],
-                "name": user["name"],
-                "email": user["email"],
-                "role": user["role"]
-            }
+            "user": user
         })
 
     except Exception as e:
         print("🔥 LOGIN ERROR:", e)
         return jsonify({"message": "Server error"}), 500
-
-
-# ================= GET SERVICES =================
-@app.route("/prices", methods=["GET"])
-def get_prices():
-    try:
-        file_path = os.path.join(os.getcwd(), "prices.json")
-
-        if not os.path.exists(file_path):
-            return jsonify({"message": "prices.json tidak ditemukan"}), 404
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        return jsonify(data)
-
-    except Exception as e:
-        print("❌ ERROR LOAD PRICES:", e)
-        return jsonify({"message": "Gagal load data"}), 500
 
 
 # ================= CREATE BOOKING =================
