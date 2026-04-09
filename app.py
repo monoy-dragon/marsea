@@ -230,6 +230,24 @@ def create_booking():
         print("❌ BOOKING ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
+# ================= GET PRICES =================
+@app.route("/prices", methods=["GET"])
+def get_prices():
+    try:
+        file_path = os.path.join(os.getcwd(), "prices.json")
+
+        if not os.path.exists(file_path):
+            return jsonify({"message": "prices.json tidak ditemukan"}), 404
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        return jsonify(data)
+
+    except Exception as e:
+        print("❌ ERROR LOAD PRICES:", e)
+        return jsonify({"message": "Gagal load data"}), 500
+
 
 # ================= GET BOOKINGS =================
 @app.route("/api/bookings", methods=["GET"])
