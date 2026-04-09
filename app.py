@@ -291,6 +291,50 @@ def admin_get_bookings():
         print("❌ ADMIN GET BOOKINGS ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
+# ================= ADMIN: UPDATE STATUS =================
+@app.route("/api/admin/bookings/<int:booking_id>/status", methods=["PUT"])
+def admin_update_status(booking_id):
+    user = get_current_user()
+
+    # 🔐 hanya admin
+    if not user or user.get("role") != "admin":
+        return jsonify({"message": "Forbidden"}), 403
+
+    try:
+        data = request.get_json()
+        status = data.get("status")
+
+        # validasi status
+        if status not in ["approved", "rejected"]:
+            return jsonify({"message": "Status tidak valid"}), 400
+
+        conn = get_db()
+        cur = conn.cursor()
+
+        # cek booking ada atau tidak
+        cur.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,))
+        booking = cur.fetchone()
+
+        if not booking:
+            return jsonify({"message": "Booking tidak ditemukan"}), 404
+
+        # update status
+        cur.execute(
+            "UPDATE bookings SET status = ? WHERE id = ?",
+            (status, booking_id)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({
+            "message": f"Status berhasil diubah ke {status}"
+        })
+
+    except Exception as e:
+        print("❌ UPDATE STATUS ERROR:", e)
+        return jsonify({"message": "Server error"}), 500
+
 
 # ================= HEALTH =================
 @app.route("/health")
