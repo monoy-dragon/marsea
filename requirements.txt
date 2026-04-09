@@ -3,3 +3,4 @@ flask-cors
 bcrypt
 PyJWT
 psycopg2-binary
+gunicorn
